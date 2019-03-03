@@ -2,7 +2,7 @@
 {
     public enum RepositoryType
     {
-        MongoDb,
+        MongoDb = 0,
         Json
     }
 }

@@ -5,7 +5,7 @@ namespace CsvLoader.Data.Factories.Interfaces
 {
     public interface IProductRepositoryFactory
     {
-        IProductRepository CreateInstance(RepositoryType repositoryType);
+        IProductRepository CreateInstance();
         IEnumerable<IProductRepository> CreateInstances();
     }
 }

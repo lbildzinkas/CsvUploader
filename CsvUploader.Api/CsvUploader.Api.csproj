@@ -13,4 +13,8 @@
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="2.2.0" />
   </ItemGroup>
 
+    <ItemGroup>
+    <ProjectReference Include="..\CsvLoader.Data\CsvLoader.Data.csproj" />
+    <ProjectReference Include="..\CsvLoader.Services\CsvLoader.Services.csproj" />
+  </ItemGroup>
 </Project>
