@@ -19,9 +19,17 @@ namespace CsvLoader.Services.Implementations
             _factory = factory;
         }
 
-        public async Task UploadCsvAndPersistProductsAsync(StreamReader stream)
+        public async Task UploadCsvAndPersistProductsAsync(string filePath)
         {
-            using (var csvReader = _factory.CreateReader(stream))
+            using(var stream = File.OpenText(filePath))
+            using (var csvReader = _factory.CreateReader(stream, new CsvHelper.Configuration.Configuration(){
+                Delimiter = ",",
+                HasHeaderRecord = true,
+                HeaderValidated = null,
+                MissingFieldFound = null,
+                IgnoreBlankLines = false,
+                ReadingExceptionOccurred = null
+            }))
             {
                 //this will yield records, so it means that it only returns a record when you iterate the list
                 var products = csvReader.GetRecords<Product>();

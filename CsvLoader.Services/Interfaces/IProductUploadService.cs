@@ -5,6 +5,6 @@ namespace CsvLoader.Services.Interfaces
 {
     public interface IProductUploadService
     {
-        Task UploadCsvAndPersistProductsAsync(StreamReader stream);
+        Task UploadCsvAndPersistProductsAsync(string filePath);
     }
 }

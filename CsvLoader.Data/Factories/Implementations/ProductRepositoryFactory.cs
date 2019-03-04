@@ -13,11 +13,11 @@ namespace CsvLoader.Data.Factories.Implementations
         private readonly Dictionary<RepositoryType, IProductRepository> _dicInstances;
         private readonly IOptionsMonitor<DatabaseSettings> _databaseSettings;
 
-        public ProductRepositoryFactory(IOptionsMonitor<DatabaseSettings> databaseSettings, IMongoDatabaseFactory mongoDatabaseFactory)
+        public ProductRepositoryFactory(IOptionsMonitor<DatabaseSettings> databaseSettings, IMongoDatabaseFactory mongoDatabaseFactory, IJsonTextWriterFactory jsonTextWriterFactory)
         {
             _dicInstances = new Dictionary<RepositoryType, IProductRepository>()
             {
-                {RepositoryType.Json, new JsonProductRepository(databaseSettings.CurrentValue.JsonSettings)},
+                {RepositoryType.Json, new JsonProductRepository(databaseSettings.CurrentValue.JsonSettings, jsonTextWriterFactory)},
                 { RepositoryType.MongoDb, new MongoProductRepository(databaseSettings.CurrentValue.MongoSettings, mongoDatabaseFactory) }
             };
             _databaseSettings = databaseSettings;

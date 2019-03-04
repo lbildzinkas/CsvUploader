@@ -14,9 +14,9 @@ namespace CsvLoader.Data.Repositories.Implementations
     {
         private readonly IMongoDatabase _db;
         private readonly string ProductCollectionName = "Products";
-        private Settings _mongoSettings;
+        private MongoSettings _mongoSettings;
 
-        public MongoProductRepository(Settings mongoSettings, IMongoDatabaseFactory mongoDatabaseFactory)
+        public MongoProductRepository(MongoSettings mongoSettings, IMongoDatabaseFactory mongoDatabaseFactory)
         {
             _db = mongoDatabaseFactory.CreateInstance(mongoSettings.ConnectionString, mongoSettings.DatabaseName);
             _mongoSettings = mongoSettings;
