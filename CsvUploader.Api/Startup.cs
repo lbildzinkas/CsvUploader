@@ -102,7 +102,7 @@ namespace CsvUploader.Api
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Syndy.ProductsService v1");
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Product Upload Api");
             });
 
             app.UseMvc();

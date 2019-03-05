@@ -14,7 +14,7 @@ namespace CsvLoader.Data.Repositories.Implementations
 {
     public class JsonProductRepository : IProductRepository
     {
-        private JsonStorageSettings _jsonSettings;
+        private readonly JsonStorageSettings _jsonSettings;
         private readonly IJsonTextWriterFactory _jsonTextWriterFactory;
 
         public JsonProductRepository(JsonStorageSettings jsonSettings, IJsonTextWriterFactory jsonTextWriterFactory)

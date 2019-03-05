@@ -18,13 +18,9 @@ namespace CsvUploader.Api.Controllers
 
         [HttpPost("upload")]
         [DisableFormValueModelBinding]
+        [Consumes("multipart/form-data")]
         public async Task<IActionResult> Upload()
         {
-            // if (!_multipartRequestUtilitiesProvider.IsMultipartContentType(Request.ContentType))
-            // {
-            //     return BadRequest($"Expected a multipart request, but got {Request.ContentType}");
-            // }
-
             await _fileUploadService.UploadFile(Request.ContentType, HttpContext.Request.Body);
 
             return Ok();
