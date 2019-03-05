@@ -1,23 +1,25 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using CsvHelper;
 using CsvLoader.Data.Common.Settings;
 using CsvLoader.Data.Factories.Implementations;
 using CsvLoader.Data.Factories.Interfaces;
 using CsvLoader.Services.Implementations;
 using CsvLoader.Services.Interfaces;
+using CsvUploader.Api.Consumers;
 using CsvUploader.Api.ExceptionHandling;
 using CsvUploader.Api.Providers;
+using CsvUploader.Api.Providers.Interfaces;
+using CsvUploader.Api.Services.Implementations;
+using CsvUploader.Api.Services.Interfaces;
+using MassTransit;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Hosting;
+using RabbitMQ.Client;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace CsvUploader.Api
@@ -35,7 +37,6 @@ namespace CsvUploader.Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-            services.AddAntiforgery(options => options.HeaderName = "X-XSRF-TOKEN");
             services.AddLogging();
             services.Configure<DatabaseSettings>(options => Configuration.GetSection("DatabaseSettings").Bind(options));
 
@@ -47,9 +48,11 @@ namespace CsvUploader.Api
             services.AddTransient<IProductRepositoryFactory, ProductRepositoryFactory>();
             services.AddTransient<IJsonTextWriterFactory, JsonTextWriterFactory>();
             services.AddTransient<IMongoDatabaseFactory, MongoDatabaseFactory>();
-            services.AddTransient<IProductUploadService, ProductUploadService>();
+            services.AddTransient<IProductPersistenceService, ProductPersistenceService>();
             services.AddTransient<IFactory, Factory>();
             services.AddTransient<IMultipartRequestUtilitiesProvider, MultipartRequestUtilitiesProvider>();
+            services.AddTransient<IFileUploadService, FileUploadService>();
+            
 
             services.Configure<FormOptions>(options =>
             {
@@ -58,10 +61,33 @@ namespace CsvUploader.Api
                 options.MultipartHeadersLengthLimit = int.MaxValue;
 
             });
+
+            services.AddMassTransit(x =>
+            {
+                x.AddConsumer<PersistProductDataCommandConsumer>();
+                x.AddBus(provider => Bus.Factory.CreateUsingRabbitMq(sbc =>
+                {
+                    var host = sbc.Host(new Uri(Configuration.GetValue<string>("RabbitMq:Host")), h =>
+                    {
+                        h.Username(Configuration.GetValue<string>("RabbitMq:User"));
+                        h.Password(Configuration.GetValue<string>("RabbitMq:Password"));
+                    });
+
+                    sbc.ExchangeType = ExchangeType.Fanout;
+                    sbc.Durable = true;
+
+                    sbc.ReceiveEndpoint(host, "CsvUploader", ec =>
+                    {
+                        ec.Consumer<PersistProductDataCommandConsumer>(provider);
+                    });
+                }));
+            });
+
+            services.AddSingleton<IHostedService, BusService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, Microsoft.AspNetCore.Hosting.IHostingEnvironment env)
         {
             if (env.IsDevelopment())
             {

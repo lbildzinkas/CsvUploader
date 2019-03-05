@@ -1,26 +1,28 @@
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using CsvHelper;
 using CsvLoader.Data.Entities;
 using CsvLoader.Data.Factories.Interfaces;
-using CsvLoader.Data.Repositories.Interfaces;
 using CsvLoader.Services.Interfaces;
 
 namespace CsvLoader.Services.Implementations
 {
-    public class ProductUploadService : IProductUploadService
+    public class ProductPersistenceService : IProductPersistenceService
     {
         private readonly IProductRepositoryFactory _productRepositoryFactory;
         private readonly IFactory _factory;
 
-        public ProductUploadService(IProductRepositoryFactory productRepositoryFactory, IFactory factory)
+        public ProductPersistenceService(IProductRepositoryFactory productRepositoryFactory, IFactory factory)
         {
             _productRepositoryFactory = productRepositoryFactory;
             _factory = factory;
         }
 
-        public async Task UploadCsvAndPersistProductsAsync(string filePath)
+        public async Task ReadUploadedCsvAndPersistProductsAsync(string filePath, CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             using(var stream = File.OpenText(filePath))
             using (var csvReader = _factory.CreateReader(stream, new CsvHelper.Configuration.Configuration(){
                 Delimiter = ",",
@@ -35,7 +37,7 @@ namespace CsvLoader.Services.Implementations
                 var products = csvReader.GetRecords<Product>();
 
                 var productRepository = _productRepositoryFactory.CreateInstance();
-                await productRepository.InsertManyAsync(products);
+                await productRepository.InsertManyAsync(products, cancellationToken);
             }
         }
     }

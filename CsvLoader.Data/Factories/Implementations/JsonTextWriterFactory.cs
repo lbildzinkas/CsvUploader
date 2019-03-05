@@ -1,4 +1,5 @@
 using System.IO;
+using CsvLoader.Data.Factories.Interfaces;
 using Newtonsoft.Json;
 
 namespace CsvLoader.Data.Factories.Implementations

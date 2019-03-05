@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace CsvLoader.Data.Factories.Implementations
+namespace CsvLoader.Data.Factories.Interfaces
 {
     public interface IJsonTextWriterFactory
     {

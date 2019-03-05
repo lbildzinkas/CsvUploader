@@ -1,10 +1,9 @@
-using System;
 using System.IO;
 using System.Text;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Net.Http.Headers;
 
-namespace CsvUploader.Api.Providers
+namespace CsvUploader.Api.Providers.Interfaces
 {
     public interface IMultipartRequestUtilitiesProvider
     {

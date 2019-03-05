@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using CsvLoader.Data.Common.Settings;
 using CsvLoader.Data.Entities;
@@ -22,13 +23,13 @@ namespace CsvLoader.Data.Repositories.Implementations
             _mongoSettings = mongoSettings;
         }
 
-        public async Task InsertManyAsync(IEnumerable<Product> products)
+        public async Task InsertManyAsync(IEnumerable<Product> products, CancellationToken cancellationToken)
         {
             var productsCollection = _db.GetCollection<Product>(ProductCollectionName);
 
             //This is only enumerated later one, mongo driver will handle the batching, this way we should not have any memory leaks
             var productsToInsert = products.Select(p => new InsertOneModel<Product>(p));
-            await productsCollection.BulkWriteAsync(productsToInsert, new BulkWriteOptions() { IsOrdered = false });
+            await productsCollection.BulkWriteAsync(productsToInsert, new BulkWriteOptions() { IsOrdered = false }, cancellationToken);
         }
     }
 }

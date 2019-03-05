@@ -4,14 +4,16 @@ EXPOSE 80
 
 FROM microsoft/dotnet:2.2-sdk AS build
 WORKDIR /src
-COPY ["CsvUploader.Api/CsvUploader.Api.csproj", "CsvUploader.Api/"]
-RUN dotnet restore "CsvUploader.Api/CsvUploader.Api.csproj"
+COPY CsvUploader.Api/CsvUploader.Api.csproj CsvUploader.Api/
+COPY CsvLoader.Services/CsvLoader.Services.csproj CsvLoader.Services/
+COPY CsvLoader.Data/CsvLoader.Data.csproj CsvLoader.Data/
+RUN dotnet restore CsvUploader.Api/CsvUploader.Api.csproj
 COPY . .
-WORKDIR "/src/CsvUploader.Api"
-RUN dotnet build "CsvUploader.Api.csproj" -c Release -o /app
+WORKDIR /src/CsvUploader.Api
+RUN dotnet build CsvUploader.Api.csproj -c Release -o /app
 
 FROM build AS publish
-RUN dotnet publish "CsvUploader.Api.csproj" -c Release -o /app
+RUN dotnet publish CsvUploader.Api.csproj -c Release -o /app
 
 FROM base AS final
 WORKDIR /app

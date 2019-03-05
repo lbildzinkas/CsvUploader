@@ -6,6 +6,6 @@ namespace CsvLoader.Data.Repositories.Interfaces
 {
     public interface IProductRepository
     {
-        Task InsertManyAsync(IEnumerable<Product> products);
+        Task InsertManyAsync(IEnumerable<Product> products, System.Threading.CancellationToken cancellationToken);
     }
 }
